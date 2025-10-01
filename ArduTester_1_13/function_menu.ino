@@ -72,21 +72,22 @@
   #define MODE_RESIS 4		/* ResistorCheck at TP1:TP3 */
   #define MODE_CAP13 5		/* Capacitor check at TP1:TP3 */
   #define MODE_BIG_CAP_CORR 6	/* Correction for big caps */
-  #define NNN 6
+  #define MODE_I2C_SCAN 7		/* I2C address scanner */
+  #define NNN 7
   #ifdef WITH_ROTARY_CHECK
-   #define MODE_ROTARY 7		/* Test Rotary Switch */
+   #define MODE_ROTARY 8		/* Test Rotary Switch */
    #undef NNN
-   #define NNN 7
+   #define NNN 8
+   #ifdef WITH_SELFTEST
+    #define MODE_SELFTEST 9	/* full selftest function with calibration */
+    #undef NNN
+    #define NNN 9
+   #endif
+  #else
    #ifdef WITH_SELFTEST
     #define MODE_SELFTEST 8	/* full selftest function with calibration */
     #undef NNN
     #define NNN 8
-   #endif
-  #else
-   #ifdef WITH_SELFTEST
-    #define MODE_SELFTEST 7	/* full selftest function with calibration */
-    #undef NNN
-    #define NNN 7
    #endif
   #endif
  #else
@@ -101,6 +102,33 @@
    #define MODE_RESIS 6		/* ResistorCheck at TP1:TP3 */
    #define MODE_CAP13 7		/* Capacitor check at TP1:TP3 */
    #define MODE_BIG_CAP_CORR 8	/* Correction for big caps */
+   #define MODE_I2C_SCAN 9		/* I2C address scanner */
+   #define NNN 9
+   #ifdef WITH_ROTARY_CHECK
+    #define MODE_ROTARY 10		/* Test Rotary Switch */
+    #undef NNN
+    #define NNN 10
+    #ifdef WITH_SELFTEST
+     #define MODE_SELFTEST 11	/* full selftest function with calibration */
+     #undef NNN
+     #define NNN 11
+    #endif
+   #else
+    #ifdef WITH_SELFTEST
+     #define MODE_SELFTEST 10	/* full selftest function with calibration */
+     #undef NNN
+     #define NNN 10
+    #endif
+   #endif
+  #else		/* no frequency scaler */
+   #define MODE_FREQ 1		/* frequency measurement */
+   #define MODE_FGEN 2		/* frequency generator function */
+   #define MODE_PWM 3		/* Pulse Width variation function */
+   #define MODE_ESR 4		/* ESR measurement in circuit */
+   #define MODE_RESIS 5		/* ResistorCheck at TP1:TP3 */
+   #define MODE_CAP13 6		/* Capacitor check at TP1:TP3 */
+   #define MODE_BIG_CAP_CORR 7	/* Correction for big caps */
+   #define MODE_I2C_SCAN 8		/* I2C address scanner */
    #define NNN 8
    #ifdef WITH_ROTARY_CHECK
     #define MODE_ROTARY 9		/* Test Rotary Switch */
@@ -116,31 +144,6 @@
      #define MODE_SELFTEST 9	/* full selftest function with calibration */
      #undef NNN
      #define NNN 9
-    #endif
-   #endif
-  #else		/* no frequency scaler */
-   #define MODE_FREQ 1		/* frequency measurement */
-   #define MODE_FGEN 2		/* frequency generator function */
-   #define MODE_PWM 3		/* Pulse Width variation function */
-   #define MODE_ESR 4		/* ESR measurement in circuit */
-   #define MODE_RESIS 5		/* ResistorCheck at TP1:TP3 */
-   #define MODE_CAP13 6		/* Capacitor check at TP1:TP3 */
-   #define MODE_BIG_CAP_CORR 7	/* Correction for big caps */
-   #define NNN 7
-   #ifdef WITH_ROTARY_CHECK
-    #define MODE_ROTARY 8		/* Test Rotary Switch */
-    #undef NNN
-    #define NNN 8
-    #ifdef WITH_SELFTEST
-     #define MODE_SELFTEST 9	/* full selftest function with calibration */
-     #undef NNN
-     #define NNN 9
-    #endif
-   #else
-    #ifdef WITH_SELFTEST
-     #define MODE_SELFTEST 8	/* full selftest function with calibration */
-     #undef NNN
-     #define NNN 8
     #endif
    #endif
   #endif
@@ -239,6 +242,9 @@ void do_menu(uint8_t func_number) {
     if (func_number == MODE_BIG_CAP_CORR) {
        set_big_cap_corr();
     }
+    if (func_number == MODE_I2C_SCAN) {
+       I2C_Scanner();		// I2C address scanner
+    }
 #ifdef WITH_SELFTEST
     if (func_number == MODE_SELFTEST) AutoCheck(0x11);	// Full selftest with calibration
 #endif
@@ -334,7 +340,7 @@ uint8_t function_menu() {
   message_key_released(SELECTION_str);
  #ifdef POWER_OFF
   uint8_t ll;
-  for (ll=0;ll<((MODE_LAST+1)*10);ll++) 
+  for (ll=0;ll<((MODE_LAST+1)*10);ll++)
  #else
   while (1)		/* without end, if no power off specified */
  #endif
@@ -391,7 +397,7 @@ uint8_t function_menu() {
            lcd_data('>');				// put a '>' marker to row 1 of line 4
         } else {
            lcd_space();				// put a blank to 1. row of line 2
-        } 
+        }
         f_nr = func_number + MODE_LAST + 1 - MENU_MIDDLE + mm;
         if (f_nr > MODE_LAST) f_nr -= (MODE_LAST +1);
         message2line(f_nr);	// show function for this line
@@ -416,7 +422,12 @@ uint8_t function_menu() {
 #endif
      {
         // selection only with key-press
-        if (func_number == MODE_TRANS) return 0;		// return to TransistorTester
+        if (func_number == MODE_TRANS) {
+          BUZZER_MENU_EXIT();  // Play exit sound when returning to main tester
+          return 0;		// return to TransistorTester
+        }
+
+        BUZZER_MENU_ENTER();  // Play enter sound when selecting a menu function
         do_menu(func_number);
         // don't increase function number for easier selection the same function
         ii = 0;			// function was executed before, do not increase func_number
@@ -437,7 +448,10 @@ uint8_t function_menu() {
         func_number += (MODE_LAST + 1 + rotary.count);	// function is decreased by rotary steps
      }
 #endif
-     if (ii > 0) func_number++;	// increase the function number with key press
+     if (ii > 0) {
+       func_number++;	// increase the function number with key press
+       BUZZER_BUTTON_PRESS();  // Play button press sound for menu navigation
+     }
   } /* end for ll */
 
   return 0;
@@ -448,7 +462,7 @@ uint8_t function_menu() {
 /* ****************************************************************** */
 /* message2line writes the message corresponding to the number to LCD */
 /* ****************************************************************** */
-void message2line(uint8_t number) { 
+void message2line(uint8_t number) {
      if (number > MODE_LAST) number -= (MODE_LAST + 1);
      if (number == MODE_TRANS) lcd_MEM2_string(TESTER_str);
  #ifndef NO_FREQ_COUNTER
@@ -471,19 +485,20 @@ void message2line(uint8_t number) {
      if (number == MODE_ROTARY) lcd_MEM2_string(RotaryEncoder_str);
  #endif
      if (number == MODE_BIG_CAP_CORR) lcd_MEM2_string(SetCapCorr_str);
+     if (number == MODE_I2C_SCAN) lcd_MEM2_string(I2C_SCANNER_str);
  #ifdef WITH_SELFTEST
      if (number == MODE_SELFTEST) lcd_MEM2_string(FULLCHECK_str);
  #endif
  #ifdef WITH_VEXT
-     if (number == MODE_VEXT) lcd_MEM_string(VOLTAGE_str); 
+     if (number == MODE_VEXT) lcd_MEM_string(VOLTAGE_str);
  #endif
  #if ((LCD_ST_TYPE == 7565) || (LCD_ST_TYPE == 8814) || (LCD_ST_TYPE == 8812) || (LCD_ST_TYPE == 1306) || defined(LCD_DOGM))
 
-     if (number == MODE_CONTRAST) lcd_MEM_string(CONTRAST_str); 
+     if (number == MODE_CONTRAST) lcd_MEM_string(CONTRAST_str);
  #endif
  #ifdef LCD_CHANGE_COLOR
-     if (number == MODE_SELECT_FG) lcd_MEM_string(FrontColor_str); 
-     if (number == MODE_SELECT_BG) lcd_MEM_string(BackColor_str); 
+     if (number == MODE_SELECT_FG) lcd_MEM_string(FrontColor_str);
+     if (number == MODE_SELECT_BG) lcd_MEM_string(BackColor_str);
  #endif
      if (number == MODE_SHOW) {
         lcd_MEM2_string(SHOW_str);
@@ -503,7 +518,7 @@ void show_C_ESR() {
   message_key_released(C_ESR_str);
 #ifdef POWER_OFF
   uint8_t times;
-  for (times=0;times<250;) 
+  for (times=0;times<250;)
 #else
   while (1)		/* wait endless without the POWER_OFF option */
 #endif
@@ -512,9 +527,9 @@ void show_C_ESR() {
         ReadBigCap(TP3,TP1);
         if (PartFound == PART_CAPACITOR) {
 #if LCD_LINES > 2
-           lcd_line2(); 	// set to line2 
+           lcd_line2(); 	// set to line2
 #else
-           lcd_line1(); 	// set to line1 
+           lcd_line1(); 	// set to line1
 #endif
            lcd_data('C');
            lcd_equal();		// lcd_data('=');
@@ -522,9 +537,9 @@ void show_C_ESR() {
            lcd_clear_line();	// clear to end of line 1
            cap.esr = GetESR(cap.cb,cap.ca);
 #if LCD_LINES > 2
-	   lcd_line3();		// use line 3 
+	   lcd_line3();		// use line 3
 #else
-           lcd_line2();		// use line 2 
+           lcd_line2();		// use line 2
 #endif
            lcd_MEM_string(&ESR_str[1]);
            if (cap.esr < 65530) {
@@ -535,14 +550,14 @@ void show_C_ESR() {
            lcd_clear_line();		// clear to end of line
         } else { // no cap found
 #if LCD_LINES > 2
-           lcd_clear_line2(); 	// clear C value 
+           lcd_clear_line2(); 	// clear C value
            lcd_line3();
 	   lcd_clear_line();	// clear old ESR value
 #else
-           lcd_line1();	//  
+           lcd_line1();	//
            lcd_MEM2_string(C_ESR_str);
            lcd_clear_line();
-           lcd_clear_line2(); 	// clear old ESR value 
+           lcd_clear_line2(); 	// clear old ESR value
 #endif
         }
 #if defined(POWER_OFF) && defined(BAT_CHECK)
@@ -567,7 +582,7 @@ void show_C_ESR() {
 /* *************************************************** */
 void show_vext() {
  #ifdef WITH_VEXT
- 
+
   uint8_t key_pressed;
   uint8_t key_long_pressed;
   unsigned int Vext;
@@ -576,21 +591,21 @@ void show_vext() {
   key_long_pressed = 0;
 #ifdef POWER_OFF
   uint8_t times;
-  for (times=0;times<240;) 
+  for (times=0;times<240;)
 #else
   while (1)			/* wait endless without option POWER_OFF */
 #endif
   {
 #ifdef TPex2
-     lcd_line1(); 	// 2 Vext measurements 
+     lcd_line1(); 	// 2 Vext measurements
 #else
      lcd_line2();		// only one measurement use line 2
 #endif	/* TPex2 */
      uart_newline();          // start of new measurement
      uart_newline();          // start of new measurement
      lcd_MEM_string(Vext_str);          // Vext=
-     Vext = W5msReadADC(TPext); // read external voltage 
-//     ADC_DDR = TXD_MSK;               //activate Software-UART 
+     Vext = W5msReadADC(TPext); // read external voltage
+//     ADC_DDR = TXD_MSK;               //activate Software-UART
   #if EXT_NUMERATOR <= (0xffff/U_VCC)
      Display_mV(Vext*EXT_NUMERATOR/EXT_DENOMINATOR,3); // Display 3 Digits of this mV units
   #else
@@ -642,7 +657,7 @@ void show_vext() {
 /* a long key press returns to the selection menu */
 /* *************************************************** */
 void make_frequency() {
-#undef KEYPRESS_LENGTH_10ms 
+#undef KEYPRESS_LENGTH_10ms
 #define KEYPRESS_LENGTH_10ms 10		/* change frequency only with >100ms key press */
   uint8_t key_pressed;
   uint8_t significant;		// number of signigficant bits to show the frequency (+16 for option)
@@ -654,18 +669,18 @@ void make_frequency() {
   uint16_t divider;		// divider for the counter clock 1,8,64,256,1024
   unsigned long  f_incre;	// frequency increment 1, 10, 100, 1000, 10000, 100000
   uint8_t f_digit;		// digit for f_incre, 0-10 or 0-20
-  uint8_t Max_Digit;		// 10 or 20 , the last digit is for 
-  uint8_t right;		// logical expression 
+  uint8_t Max_Digit;		// 10 or 20 , the last digit is for
+  uint8_t right;		// logical expression
 
   message_key_released(F_GEN_str);	// display f-Generator and wait for key released
-  // OC1B is connected with 680 Ohm resistor to TP2 (middle test pin) 
+  // OC1B is connected with 680 Ohm resistor to TP2 (middle test pin)
   TCCR1A = (0<<COM1B1) | (1<<COM1B0) | (0<<WGM11) | (0<<WGM10); // CTC mode, count to OCR1A
   TIMSK1 = 0;		// no interrupt used
   OCR1A = 1;		// highest frequency
   OCR1B	= 0;		// toggle OC1B at this count
   TIFR1 = (1<<OCF1A) | (1<<OCF1A) | (1<<TOV1);	// reset interrupt flags
   TCCR1C = 0;
-  TCCR1B = (0<<WGM13) | (1<<WGM12) | (0<<CS12) | (0<<CS11) | (0<<CS10); // set counter mode 
+  TCCR1B = (0<<WGM13) | (1<<WGM12) | (0<<CS12) | (0<<CS11) | (0<<CS10); // set counter mode
   R_PORT = 0;		// set all resistor port outputs to GND
 #if PROCESSOR_TYP == 644
   R_DDR = (1<<PIN_RL1) | (1<<PIN_RL2) | (1<<PIN_RL3);		// set TP1, DDD4(TP2) and TP3 to output
@@ -690,7 +705,7 @@ void make_frequency() {
   uint8_t shown_points;		// one point for every 30 seconds wait time
   uint8_t times;		// total wait time
   shown_points = 0;
-  for (times=0; times<240;) 
+  for (times=0; times<240;)
 #else
   while (1)			/* wait endless without option POWER_OFF */
 #endif
@@ -699,7 +714,7 @@ void make_frequency() {
      new_points = (times+10) / 30;
      if (new_points != shown_points) {
         // count of points has changed, build LCD line1 new
-        lcd_line1();	// position to line 1 
+        lcd_line1();	// position to line 1
         lcd_MEM2_string(F_GEN_str);	// display f-Generator
         shown_points = new_points;
         for (new_points=0; new_points<shown_points ;new_points++) {
@@ -755,7 +770,7 @@ void make_frequency() {
         // no divide
         TCCR1B = (0<<WGM13) | (1<<WGM12) | (0<<CS12) | (0<<CS11) | (1<<CS10); // no clock divide
      }
-     OCR1A = (hperiod.dw / divider) - 1;	// the remainder divider  match to 16-bit counter 
+     OCR1A = (hperiod.dw / divider) - 1;	// the remainder divider  match to 16-bit counter
      if (OCR1A == 0) OCR1A = 1;
 #if (LCD_LINES > 2)
      lcd_clear_line();		// clear to end of line 2
@@ -795,7 +810,7 @@ void make_frequency() {
            // frequency string will move to the left, upper digit will move to the next lower digit
            Max_Digit = 10;		// f_incre will be 10kHz or less, allways 0-9
            significant--;		// diplay one digit less
-           f_incre /= 10;		// 
+           f_incre /= 10;		//
            f_digit = (wish_freq / f_incre) % 10; // start with last digit
            continue;
         } else {
@@ -832,12 +847,12 @@ void make_frequency() {
   } /* end for times */
   TCCR1B = 0;		// stop counter
   TCCR1A = 0;		// stop counter
-  ADC_DDR =  TXD_MSK;	// disconnect TP1 
+  ADC_DDR =  TXD_MSK;	// disconnect TP1
   R_DDR = 0;		// switch resistor ports to Input
 #if PROCESSOR_TYP == 1280
-  DDRB  &= ~(1<<DDB6);	// disable output 
+  DDRB  &= ~(1<<DDB6);	// disable output
 #else
-  DDRB  &= ~(1<<DDB2);	// disable output 
+  DDRB  &= ~(1<<DDB2);	// disable output
 #endif
 
 } /* end make frequency */
@@ -856,7 +871,7 @@ void do_10bit_PWM() {
   uint8_t old_perc;		// old duty-cycle in %
   unsigned int pwm_flip;	// value for counter to flip the state
   message_key_released(PWM_10bit_str);	// display PWM-Generator and wait for key released
-  // OC1B is connected with 680 Ohm resistor to TP2 (middle test pin) 
+  // OC1B is connected with 680 Ohm resistor to TP2 (middle test pin)
   TCCR1A = (1<<COM1B1) | (0<<COM1B0) | (1<<WGM11) | (1<<WGM10); // fast PWM mode, mode 7: count to 10 bit
   TIMSK1 = 0;		// no interrupt used
   OCR1B	= 0xff;		// toggle OC1B at this count
@@ -888,7 +903,7 @@ void do_10bit_PWM() {
   percent = (SERVO_MAX + SERVO_MIN) / 2;	// set to middle
 #ifdef POWER_OFF
   uint8_t times;		// time limit
-  for (times=0; times<240; ) 
+  for (times=0; times<240; )
 #else
   while (1)			/* wait endless without option POWER_OFF */
 #endif
@@ -947,14 +962,14 @@ void do_10bit_PWM() {
 #endif
   } /* end for times */
 
-  ADC_DDR =  TXD_MSK;	// disconnect TP1 
+  ADC_DDR =  TXD_MSK;	// disconnect TP1
   TCCR1B = 0;		// stop counter
   TCCR1A = 0;		// stop counter
   R_DDR = 0;		// switch resistor ports to Input
 #if PROCESSOR_TYP == 1280
-  DDRB  &= ~(1<<DDB6);	// disable output 
+  DDRB  &= ~(1<<DDB6);	// disable output
 #else
-  DDRB  &= ~(1<<DDB2);	// disable output 
+  DDRB  &= ~(1<<DDB2);	// disable output
 #endif
 } /* end do_10bit_PWM */
 
@@ -997,8 +1012,8 @@ uint8_t contrast;
    lcd_command(CMD_SET_VOP_LOWER | (contrast & 0x1f));    // set lower Vop
   #else		/* DOGM display */
      lcd_command(CMD_SetIFOptions | MODE_8BIT | 0x09);	// 2-line / IS=1
-     lcd_command(CMD1_PowerControl | ((contrast>>4)&0x07));	// booster on,off / set contrast C5:C4 
-     lcd_command(CMD1_SetContrast | (contrast&0x0f));	// set contrast C3:0 
+     lcd_command(CMD1_PowerControl | ((contrast>>4)&0x07));	// booster on,off / set contrast C5:C4
+     lcd_command(CMD1_SetContrast | (contrast&0x0f));	// set contrast C3:0
      lcd_command(CMD_SetIFOptions | MODE_8BIT | 0x08);	// 2-line / IS=0
   #endif
      lcd_line2();
@@ -1025,7 +1040,7 @@ uint8_t contrast;
         if (key_pressed > 40) {
            contrast++; // longer key press select higher contrast value
         } else {
-           contrast += MAX_CONTRAST;	// decrease the contrast 
+           contrast += MAX_CONTRAST;	// decrease the contrast
         }
      }
      contrast &= MAX_CONTRAST;
@@ -1126,7 +1141,7 @@ uint8_t max_value;
 #endif
      if (key_pressed > 0) {
         if (key_pressed > 40) {
-           c_num += 2;	// decrease the color number 
+           c_num += 2;	// decrease the color number
         } else {
            c_num++;		// increase the color number
         }
@@ -1195,7 +1210,7 @@ int8_t korr;
         if (key_pressed > 40) {
            korr++; // longer key press select higher korr value
         } else {
-           korr--;	// decrease the korr 
+           korr--;	// decrease the korr
         }
      }
      if (korr > MAX_KORR) korr -= (MAX_KORR - MIN_KORR + 1);

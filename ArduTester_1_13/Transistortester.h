@@ -20,7 +20,7 @@
 
 #if defined (MAIN_C)
   /* The voltage at a capacitor grows with  Uc = VCC * (1 - e**(-t/T))
-  The voltage 1.3V is reached at  t = -ln(3.7/5)*T  = 0.3011*T . 
+  The voltage 1.3V is reached at  t = -ln(3.7/5)*T  = 0.3011*T .
   Time constant is  T = R * C ; also
   C = T / R
   for the resistor 470 kOhm  is C = t / (0.3011 * 470000)
@@ -109,7 +109,7 @@ const uint16_t RLtab[] MEM_TEXT = {
  #endif
 */
 
-const uint16_t RHtab[] PROGMEM = { 
+const uint16_t RHtab[] PROGMEM = {
   44814201./R_H_VAL+0.5,   // 1000 mV
   42422794./R_H_VAL+0.5,   // 1050 mV
   40247707./R_H_VAL+0.5,   // 1100 mV
@@ -130,7 +130,7 @@ const uint16_t RHtab[] PROGMEM = {
 // all if statements are corrected to the mV resolution.
 
 /*########################################################################################
-End of configuration 
+End of configuration
 */
 
 /*Strings in PROGMEM or in EEprom
@@ -188,9 +188,19 @@ End of configuration
    const unsigned char RotaryEncoder_str[] MEM2_TEXT = "rotary encoder";
   #endif
    const unsigned char SetCapCorr_str[] MEM2_TEXT = {'C','(',LCD_CHAR_U,'F',')','-','c','o','r','r','e','c','t','i','o','n',0};
-   const unsigned char TURN_str[] MEM2_TEXT = "turn!";	
+   const unsigned char TURN_str[] MEM2_TEXT = "turn!";
    const unsigned char FULLCHECK_str[] MEM2_TEXT = "Selftest";
    const unsigned char SHORT_PROBES_str[] MEM2_TEXT = "short Probes!";
+   const unsigned char I2C_SCAN_str[] MEM2_TEXT = "I2C Scanner";
+   const unsigned char I2C_SCANNER_str[] MEM2_TEXT = "I2C-Scanner";
+   const unsigned char Scanning_str[] MEM2_TEXT = "Scanning...";
+   const unsigned char NoI2C_str[] MEM2_TEXT = "No I2C devices";
+   const unsigned char Found_str[] MEM2_TEXT = "found!";
+   const unsigned char I2C_Found_str[] MEM2_TEXT = "I2C:";
+   const unsigned char I2C_Found_str2[] MEM2_TEXT = " I2C found";
+   const unsigned char Page_str[] MEM2_TEXT = " P";
+   const unsigned char Addr_str[] MEM2_TEXT = "0x";
+   const unsigned char Space_str[] MEM2_TEXT = "  ";
 #ifndef NO_FREQ_COUNTER
    const unsigned char FREQ_str[] MEM2_TEXT = "Frequency";
  #ifdef WITH_FREQUENCY_DIVIDER
@@ -218,7 +228,7 @@ End of configuration
  const unsigned char Bat_str[] MEM_TEXT = "Bat. ";
  const unsigned char OK_str[] MEM_TEXT = "OK";
 #if FLASHEND > 0x1fff
- #ifndef DC_PWR_TEXT 
+ #ifndef DC_PWR_TEXT
   #define DC_PWR_TEXT "DC Pwr Mode"
  #endif
  const unsigned char DC_Pwr_Mode_str[] MEM_TEXT = DC_PWR_TEXT;
@@ -417,7 +427,7 @@ const unsigned char RESIS_13_str[] MEM2_TEXT = {'1'+TP1,LCD_CHAR_LINE1, LCD_CHAR
 #ifdef SHOW_R_DS
  const unsigned char RDS_str[] MEM_TEXT = {"RDS="};
 #endif
- 
+
 
  const unsigned char CapIcon[] MEM_TEXT = { 0x1b,
 				     0x1b,
@@ -539,9 +549,19 @@ const unsigned char RESIS_13_str[] MEM2_TEXT = {'1'+TP1,LCD_CHAR_LINE1, LCD_CHAR
   extern const unsigned char RotaryEncoder_str[] MEM2_TEXT ;
   #endif
   extern const unsigned char SetCapCorr_str[] MEM2_TEXT ;
-  extern const unsigned char TURN_str[] MEM2_TEXT ;	
+  extern const unsigned char TURN_str[] MEM2_TEXT ;
   extern const unsigned char FULLCHECK_str[] MEM2_TEXT ;
   extern const unsigned char SHORT_PROBES_str[] MEM2_TEXT ;
+  extern const unsigned char I2C_SCAN_str[] MEM2_TEXT ;
+  extern const unsigned char I2C_SCANNER_str[] MEM2_TEXT ;
+  extern const unsigned char Scanning_str[] MEM2_TEXT ;
+  extern const unsigned char NoI2C_str[] MEM2_TEXT ;
+  extern const unsigned char Found_str[] MEM2_TEXT ;
+  extern const unsigned char I2C_Found_str[] MEM2_TEXT ;
+  extern const unsigned char I2C_Found_str2[] MEM2_TEXT ;
+  extern const unsigned char Page_str[] MEM2_TEXT ;
+  extern const unsigned char Addr_str[] MEM2_TEXT ;
+  extern const unsigned char Space_str[] MEM2_TEXT ;
   #if PROCESSOR_TYP == 644
   extern const unsigned char HFREQ_str[] MEM2_TEXT ;
   extern const unsigned char H_CRYSTAL_str[] MEM2_TEXT ;
@@ -562,7 +582,7 @@ const unsigned char RESIS_13_str[] MEM2_TEXT = {'1'+TP1,LCD_CHAR_LINE1, LCD_CHAR
  #endif
   extern const unsigned char Bat_str[];
   extern const unsigned char BatWeak[];
-  extern const unsigned char BatEmpty[]; 
+  extern const unsigned char BatEmpty[];
   extern const unsigned char OK_str[];
 
  #if FLASHEND > 0x1fff
@@ -653,7 +673,7 @@ const unsigned char RESIS_13_str[] MEM2_TEXT = {'1'+TP1,LCD_CHAR_LINE1, LCD_CHAR
 
   extern const unsigned char CapIcon[] MEM_TEXT;	// Capacitor Icon
   extern const unsigned char DiodeIcon1[] MEM_TEXT;	// Diode-Icon Anode left
-  
+
   extern const unsigned char DiodeIcon2[] MEM_TEXT;	// Diode-Icon Anode right
   extern const unsigned char ResIcon1[] MEM_TEXT;	// Resistor Icon1
   extern const unsigned char ResIcon2[] MEM_TEXT;	// Resistor Icon2

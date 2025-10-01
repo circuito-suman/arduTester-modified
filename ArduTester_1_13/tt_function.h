@@ -23,12 +23,12 @@ void DiodeSymbol_ACpin(uint8_t nn);	// output diode symbpl with pins  ->|-3
 void DiodeSymbol_CpinApin(uint8_t nn);	// output diode symbpl with pins 1-|<-3
 void DiodeSymbol_CApin(uint8_t nn);	// output diode symbpl with pins  -|<-3
 void UfAusgabe(uint8_t bcdchar);	// Output of the threshold voltage(s) Uf
-void mVAusgabe(uint8_t nn);		// Output of the theshold voltage for Diode nn 
+void mVAusgabe(uint8_t nn);		// Output of the theshold voltage for Diode nn
 void RvalOut(uint8_t nrr);		// Output of the resistor value(s)
 void ShowResistor(void);		// show one or two Resistors
 void EntladePins(void);			// discharge capacitors
-void RefVoltage(void);			// compensate the reference voltage for comparator 
-void AutoCheck(uint8_t test_mode);	// check if self-test should be done 
+void RefVoltage(void);			// compensate the reference voltage for comparator
+void AutoCheck(uint8_t test_mode);	// check if self-test should be done
 unsigned int GetRLmultip(unsigned int cvolt);  // get C-Multiplikator for voltage cvolt
 void Scale_C_with_vcc(void);		// scale capacity value for different VCC Voltages
 void scale_intref_adc(void);		// get scale factors for ReadADC with internal reference
@@ -38,7 +38,7 @@ void DisplayValue16(uint16_t vval,int8_t Expo,unsigned char Unit, uint8_t Digits
 void Display_mV(uint16_t val, uint8_t dd);		// show mV with dd digits
 void Display_Hz(unsigned long val, uint8_t dd);		// show Hz with dd digits
 unsigned int compute_hfe(unsigned int lpx, unsigned int tpy);
-void sleep_5ms(uint8_t xxx);		// set processor to sleep state for xxx times 5ms, xxx>200  (xxx-200)*100  
+void sleep_5ms(uint8_t xxx);		// set processor to sleep state for xxx times 5ms, xxx>200  (xxx-200)*100
 void PinLayout(char pin1, char pin2, char pin3); // show pin layout with EBC= or 123=
 void PinLayoutLine(char pin1, char pin2, char pin3); // show pin layout with Pin 1=...
 void Calibrate_UR(void);		// get reference voltages and port resistance
@@ -53,14 +53,14 @@ void u2lcd(uint16_t iw);		// output unsigned integer value to LCD
 void i2lcd_space(int iw);		// output integer value to LCD and ' '
 void u2lcd_space(uint16_t iw);		// output unsigned integer value to LCD and ' '
 void EE_check_init(void);		// check calibration values and init the values if unset
-void GetFrequency(uint8_t range);	// measure Frequency and display 
+void GetFrequency(uint8_t range);	// measure Frequency and display
 uint8_t function_menu();			// menu for selecting extra function
-void show_vext();			// show external voltage (zener) 
+void show_vext();			// show external voltage (zener)
 void set_big_cap_corr();		// set the correction value for big capacitor measurement
 void message_key_released(const unsigned char XX_str[]); // clear display, show message XX_str and wait for released key
 void make_frequency(void);		// start counter 1 to make frequency at middle pin
 void do_10bit_PWM(void);		// start counter 1 to make fixed frequency with PWM
-void show_C_ESR();			// show big capacity values and ESR 
+void show_C_ESR();			// show big capacity values and ESR
 void show_Resis13();			// show Resistor value at TP1:TP3 , measuring continuously
 void show_Cap13(void);		        // show Capacitor value at TP1:TP3, measuring continuously
 void show_resis(uint8_t pin1, uint8_t pin2, uint8_t how);   // show resistor (and inductance) between pin1 and pin2
@@ -79,11 +79,19 @@ uint8_t Pwr_mode_check(uint8_t ll);	// give next counter state depending on DC_P
 void Bat_update(uint8_t tt);		// Update Battery voltage
 void init_parts(void);			// initialize all parts to nothing found
 void i2c_init(void);			// init the I2C interface
+void I2C_Scanner(void);			// I2C address scanner function
+void display_i2c_page(uint8_t* addresses, uint8_t total_devices, uint8_t page, uint8_t per_page); // Display page of I2C addresses
+uint8_t i2c_test_device(uint8_t address);	// Test if I2C device exists at address
+void i2c_start(void);			// I2C start condition
+void i2c_stop(void);			// I2C stop condition
+uint8_t i2c_write_byte(uint8_t data);	// I2C write byte and return ACK
+void play_i2c_device_sound(uint8_t address); // Play sound based on I2C device address
+void play_component_sound(uint8_t component_type); // Play sound based on component type
 uint16_t Rnum2pins(uint8_t num);	// compute Pin-Numbers of the resistor number
 void myuart_putc(uint8_t bb);
 void uart_int(uint16_t num);
 void CheckUJT(void);		// measure UJT
-void select_color(uint8_t xc);		// select color function 
+void select_color(uint8_t xc);		// select color function
 void switch_tester_off(void);		// switch power off
 uint8_t search_vak_diode(void);		// search the diode number of the diode connected to emitter and collector
 void mVOut(uint16_t vv);		// mV output for debug
@@ -97,10 +105,10 @@ uint16_t samplingADC(   // code is in sampling_ADC.S
    uint16_t what, 	// what to measure? see smplADC_... defs in config.h, R24:R25
    void *ptr,           // output pointer (note: ptr[0] will contain incorrect data; ptr[1]...ptr[n-1] will be valid) R22:R23
    uint8_t n,           // number of samples (n=0 for 256), R20
-   uint8_t Rport_1,	
-   uint8_t Rddr_1,	
-   uint8_t Rport_0,	
-   uint8_t Rddr_0      
+   uint8_t Rport_1,
+   uint8_t Rddr_1,
+   uint8_t Rport_0,
+   uint8_t Rddr_0
    );
 // ptr can point to an array of either 8 or 16 bit data (with or without smplADC_8bit, respectively)
 // and either signed or unsigned (with or without smplADC_hpf, respectively)
@@ -119,7 +127,7 @@ uint16_t samplingADC(   // code is in sampling_ADC.S
 
 
 
-int32_t sampling_cap(uint8_t HighPin, uint8_t LowPin, uint8_t opts);   
+int32_t sampling_cap(uint8_t HighPin, uint8_t LowPin, uint8_t opts);
 // returns measured capacitance in 0.01 pF units
 // opts&1 is flag demands measurement at 5 V rather than at 0 V
 // opts&2 is flag to not subtract the parasitic capacitance
@@ -140,4 +148,14 @@ uint16_t samplingADC_freqgen(uint16_t, void*, uint8_t, uint8_t, uint8_t, uint8_t
 // version to be called when using samlingADC_sck option, to also pass the desired short circuit duration:
 uint16_t samplingADC_freqgen_sck(uint16_t, void*, uint8_t, uint8_t, uint8_t, uint8_t, uint8_t, uint16_t freq, uint8_t shortcircuitduration);
 #endif
+#endif
+
+// I2C Scanner function declarations
+#ifdef WITH_MENU
+void I2C_Scanner(void);
+void display_i2c_page(uint8_t* addresses, uint8_t total_devices, uint8_t page, uint8_t per_page);
+uint8_t i2c_test_device(uint8_t address);
+void i2c_start(void);
+void i2c_stop(void);
+uint8_t i2c_write_byte(uint8_t data);
 #endif

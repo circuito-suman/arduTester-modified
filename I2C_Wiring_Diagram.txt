@@ -1,0 +1,59 @@
+I2C Device Connection Diagram for ArduTester
+=============================================
+
+Arduino Nano (ArduTester)        I2C Device
+     ┌─────────────┐             ┌─────────────┐
+     │             │             │             │
+     │         A4──┼─────────────┼──SDA        │
+     │         A5──┼─────────────┼──SCL        │
+     │        VCC──┼─────────────┼──VCC        │
+     │        GND──┼─────────────┼──GND        │
+     │             │             │             │
+     └─────────────┘             └─────────────┘
+
+Pull-up Resistors (typically 4.7kΩ):
+     VCC
+      │
+     ┌┴┐ 4.7kΩ
+     │ │
+     └┬┘
+      │
+SDA───┼─── (to A4)
+      │
+     ┌┴┐ 4.7kΩ
+     │ │
+     └┬┘
+      │
+SCL───┴─── (to A5)
+
+Example with OLED Display (SSD1306):
+====================================
+Arduino Nano    OLED Display
+A4 (SDA)  ──────  SDA
+A5 (SCL)  ──────  SCL
+VCC       ──────  VCC (3.3V or 5V)
+GND       ──────  GND
+
+Example with RTC Module (DS3231):
+=================================
+Arduino Nano    DS3231 RTC
+A4 (SDA)  ──────  SDA
+A5 (SCL)  ──────  SCL
+VCC       ──────  VCC (5V)
+GND       ──────  GND
+
+Multiple Device Connection:
+==========================
+                  ┌── Device 1 (0x3C)
+Arduino A4 ───────┼── Device 2 (0x68)
+                  └── Device 3 (0x50)
+
+                  ┌── Device 1 (0x3C)
+Arduino A5 ───────┼── Device 2 (0x68)
+                  └── Device 3 (0x50)
+
+Notes:
+- All devices share the same SDA and SCL lines
+- Each device must have a unique I2C address
+- Pull-up resistors are typically only needed once per bus
+- Some modules (like many Arduino shields) include pull-up resistors

@@ -29,6 +29,7 @@
 // Place at the top of your file, after includes
 #define BUZZER_PIN A5
 
+// Basic sounds
 int melody_success[] = {523, 659, 784};
 int durations_success[] = {8, 8, 4};
 
@@ -37,6 +38,106 @@ int durations_error[] = {8, 8, 8, 4};
 
 int melody_testing[] = {262, 294, 330};
 int durations_testing[] = {8, 8, 4};
+
+// Component-specific sounds
+int melody_resistor[] = {440, 493, 523};
+int durations_resistor[] = {8, 8, 6};
+
+int melody_capacitor[] = {523, 659, 784, 988};
+int durations_capacitor[] = {8, 8, 8, 4};
+
+int melody_diode[] = {659, 523};
+int durations_diode[] = {6, 8};
+
+int melody_transistor[] = {392, 523, 659, 523};
+int durations_transistor[] = {8, 6, 6, 8};
+
+int melody_inductor[] = {293, 349, 392};
+int durations_inductor[] = {8, 8, 6};
+
+// I2C Scanner sounds
+int melody_i2c_found[] = {523, 659, 784, 988};
+int durations_i2c_found[] = {8, 8, 8, 4};
+
+int melody_i2c_scan_start[] = {440, 523};
+int durations_i2c_scan_start[] = {8, 8};
+
+int melody_i2c_no_devices[] = {392, 349, 294};
+int durations_i2c_no_devices[] = {8, 8, 6};
+
+int melody_i2c_oled[] = {659, 784, 880};
+int durations_i2c_oled[] = {6, 6, 8};
+
+int melody_i2c_rtc[] = {523, 659};
+int durations_i2c_rtc[] = {8, 8};
+
+int melody_i2c_eeprom[] = {440, 523, 659, 523};
+int durations_i2c_eeprom[] = {8, 6, 6, 8};
+
+// Menu and UI sounds
+int melody_button_press[] = {800};
+int durations_button_press[] = {16};
+
+int melody_menu_enter[] = {600, 800};
+int durations_menu_enter[] = {12, 8};
+
+int melody_menu_exit[] = {800, 600};
+int durations_menu_exit[] = {8, 12};
+
+// Error type sounds
+int melody_short_circuit[] = {196, 0, 196, 0, 196};
+int durations_short_circuit[] = {16, 32, 16, 32, 8};
+
+int melody_open_circuit[] = {880, 0, 880};
+int durations_open_circuit[] = {8, 16, 8};
+
+int melody_unstable[] = {400, 600, 400, 600};
+int durations_unstable[] = {12, 12, 12, 12};
+
+// Special sounds
+int melody_startup[] = {294, 330, 370, 392, 440, 494, 523};
+int durations_startup[] = {16, 16, 16, 16, 16, 16, 8};
+
+int melody_calibration[] = {523, 659, 784, 659, 523};
+int durations_calibration[] = {8, 8, 8, 8, 6};
+
+// Function prototype for play_melody
+void play_melody(const int *notes, const int *durations, uint8_t length);
+
+// Basic buzzer macros
+#define BUZZER_SUCCESS() play_melody(melody_success, durations_success, sizeof(melody_success) / sizeof(int))
+#define BUZZER_ERROR() play_melody(melody_error, durations_error, sizeof(melody_error) / sizeof(int))
+#define BUZZER_TESTING() play_melody(melody_testing, durations_testing, sizeof(melody_testing) / sizeof(int))
+
+// Component detection buzzer macros
+#define BUZZER_RESISTOR() play_melody(melody_resistor, durations_resistor, sizeof(melody_resistor) / sizeof(int))
+#define BUZZER_CAPACITOR() play_melody(melody_capacitor, durations_capacitor, sizeof(melody_capacitor) / sizeof(int))
+#define BUZZER_DIODE() play_melody(melody_diode, durations_diode, sizeof(melody_diode) / sizeof(int))
+#define BUZZER_TRANSISTOR() play_melody(melody_transistor, durations_transistor, sizeof(melody_transistor) / sizeof(int))
+#define BUZZER_INDUCTOR() play_melody(melody_inductor, durations_inductor, sizeof(melody_inductor) / sizeof(int))
+
+// I2C Scanner buzzer macros
+#define BUZZER_I2C_FOUND() play_melody(melody_i2c_found, durations_i2c_found, sizeof(melody_i2c_found) / sizeof(int))
+#define BUZZER_I2C_SCAN_START() play_melody(melody_i2c_scan_start, durations_i2c_scan_start, sizeof(melody_i2c_scan_start) / sizeof(int))
+#define BUZZER_I2C_NO_DEVICES() play_melody(melody_i2c_no_devices, durations_i2c_no_devices, sizeof(melody_i2c_no_devices) / sizeof(int))
+#define BUZZER_I2C_OLED() play_melody(melody_i2c_oled, durations_i2c_oled, sizeof(melody_i2c_oled) / sizeof(int))
+#define BUZZER_I2C_RTC() play_melody(melody_i2c_rtc, durations_i2c_rtc, sizeof(melody_i2c_rtc) / sizeof(int))
+#define BUZZER_I2C_EEPROM() play_melody(melody_i2c_eeprom, durations_i2c_eeprom, sizeof(melody_i2c_eeprom) / sizeof(int))
+
+// Menu and UI buzzer macros
+#define BUZZER_BUTTON_PRESS() play_melody(melody_button_press, durations_button_press, sizeof(melody_button_press) / sizeof(int))
+#define BUZZER_MENU_ENTER() play_melody(melody_menu_enter, durations_menu_enter, sizeof(melody_menu_enter) / sizeof(int))
+#define BUZZER_MENU_EXIT() play_melody(melody_menu_exit, durations_menu_exit, sizeof(melody_menu_exit) / sizeof(int))
+
+// Error type buzzer macros
+#define BUZZER_SHORT_CIRCUIT() play_melody(melody_short_circuit, durations_short_circuit, sizeof(melody_short_circuit) / sizeof(int))
+#define BUZZER_OPEN_CIRCUIT() play_melody(melody_open_circuit, durations_open_circuit, sizeof(melody_open_circuit) / sizeof(int))
+#define BUZZER_UNSTABLE() play_melody(melody_unstable, durations_unstable, sizeof(melody_unstable) / sizeof(int))
+
+// Special buzzer macros
+#define BUZZER_STARTUP() play_melody(melody_startup, durations_startup, sizeof(melody_startup) / sizeof(int))
+#define BUZZER_CALIBRATION() play_melody(melody_calibration, durations_calibration, sizeof(melody_calibration) / sizeof(int))
+
 #define buzzer_off() noTone(BUZZER_PIN)
 
 void play_melody(const int *notes, const int *durations, uint8_t length)
@@ -54,9 +155,46 @@ void play_melody(const int *notes, const int *durations, uint8_t length)
   }
 }
 
-#define BUZZER_SUCCESS() play_melody(melody_success, durations_success, sizeof(melody_success) / sizeof(int))
-#define BUZZER_ERROR() play_melody(melody_error, durations_error, sizeof(melody_error) / sizeof(int))
-#define BUZZER_TESTING() play_melody(melody_testing, durations_testing, sizeof(melody_testing) / sizeof(int))
+// Play specific sound based on I2C device address
+void play_i2c_device_sound(uint8_t address) {
+  if (address == 0x3C || address == 0x3D) {
+    BUZZER_I2C_OLED();  // OLED display sound
+  } else if (address == 0x68) {
+    BUZZER_I2C_RTC();   // RTC module sound
+  } else if (address >= 0x50 && address <= 0x57) {
+    BUZZER_I2C_EEPROM(); // EEPROM sound
+  } else if (address >= 0x48 && address <= 0x4F) {
+    BUZZER_I2C_FOUND();  // ADC/Sensor sound
+  } else if (address == 0x76 || address == 0x77) {
+    BUZZER_I2C_FOUND();  // Pressure sensor sound
+  } else {
+    BUZZER_I2C_FOUND();  // Generic I2C device sound
+  }
+}
+
+// Play component detection sound based on component type
+void play_component_sound(uint8_t component_type) {
+  switch(component_type) {
+    case 1: // Resistor
+      BUZZER_RESISTOR();
+      break;
+    case 2: // Capacitor
+      BUZZER_CAPACITOR();
+      break;
+    case 3: // Diode
+      BUZZER_DIODE();
+      break;
+    case 4: // Transistor
+      BUZZER_TRANSISTOR();
+      break;
+    case 5: // Inductor
+      BUZZER_INDUCTOR();
+      break;
+    default:
+      BUZZER_SUCCESS();
+      break;
+  }
+}
 
 /* defines global variables in RAM and EEprom from file tt_globals.h */
 /* removed ifdef MAIN_C because always defined */
@@ -286,6 +424,10 @@ void setup()
 {
 
   buzzer_off();
+
+  // Play startup sound
+  delay(500);  // Brief delay before startup sound
+  BUZZER_STARTUP();
 
 #ifdef WITH_HARDWARE_SERIAL
   Serial.begin(115200); // Serial Monitor
@@ -546,6 +688,7 @@ loop_start:
 #endif
 #ifdef WITH_MENU
   AutoCheck(0x00); // check, if selftest should be done, only calibration
+  BUZZER_CALIBRATION();  // Play calibration completion sound
 #else
   AutoCheck(0x01); // check, if selftest should be done, full selftest without MENU
 #endif
@@ -702,6 +845,7 @@ loop_start:
 
   if (PartFound == PART_CAPACITOR)
   {
+    BUZZER_CAPACITOR();  // Play capacitor detection sound
 #if FLASHEND > 0x3fff
     if ((cap.ca + cap.cb) == (TP1 + TP3))
     {
@@ -743,6 +887,7 @@ loop_start:
   // ========================================
   if (PartFound == PART_DIODE)
   {
+    BUZZER_DIODE();  // Play diode detection sound
     // ========================================
     if (NumOfDiodes == 1)
     { // single Diode
@@ -891,6 +1036,7 @@ loop_start:
   }
   else if (PartFound == PART_TRANSISTOR)
   {
+    BUZZER_TRANSISTOR();  // Play transistor detection sound
     // ========================================
 #ifdef SEARCH_PARASITIC
     if ((ptrans.count != 0) && (ntrans.count != 0))
@@ -1117,7 +1263,8 @@ loop_start:
     // ========================================
   }
   else if (PartFound == PART_FET)
-  { /* JFET or MOSFET */
+  {
+    BUZZER_TRANSISTOR();  // Play transistor sound for FET (similar component) /* JFET or MOSFET */
     // ========================================
 #ifdef WITH_GRAPHICS
     unsigned char fetidx = 0;
@@ -1452,6 +1599,7 @@ loop_start:
 resistor_out:
   if (ResistorsFound != 0)
   {
+    BUZZER_RESISTOR();  // Play resistor detection sound
     if (ResistorsFound == 1)
     { // single resistor
 
